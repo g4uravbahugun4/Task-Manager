@@ -9,39 +9,44 @@ export function NewTask({ open, setOpen }) {
 
   const handleOpen = () => setOpen(!open);
 
-   const getCurrentDate = () => {
+  const getCurrentDate = () => {
     const currentDate = new Date();
     return `${currentDate.getDate()}-${currentDate.getMonth() + 1}-${currentDate.getFullYear()}`;
   };
 
+  const isFormValid = () => {
+    return taskName.trim() !== "" && taskDescription.trim() !== "" && taskPriority.trim() !== "";
+  };
+
   const handleAddTask = () => {
-    
-  const taskId = uuidv4();
+    if (isFormValid()) {
+      const taskId = uuidv4();
+      const newTask = {
+        id: taskId,
+        name: taskName,
+        description: taskDescription,
+        priority: taskPriority,
+        date: getCurrentDate(),
+        status: "incomplete",
+      };
 
-   
-    const newTask = {
-      id: taskId,
-      name: taskName,
-      description: taskDescription,
-      priority: taskPriority,
-      date:getCurrentDate(),
-      status:"incomplete"
-    };
+     
+      const existingTasks = JSON.parse(localStorage.getItem("tasks")) || [];
 
-    // Get existing tasks from localStorage or initialize an empty array
-    const existingTasks = JSON.parse(localStorage.getItem("tasks")) || [];
+      
+      existingTasks.push(newTask);
 
-    // Add the new task to the array
-    existingTasks.push(newTask);
+      
+      localStorage.setItem("tasks", JSON.stringify(existingTasks));
 
-    // Save the updated tasks array back to localStorage
-    localStorage.setItem("tasks", JSON.stringify(existingTasks));
-    const storageUpdateEvent = new Event('storageUpdate');
-    window.dispatchEvent(storageUpdateEvent);
-    // Close the dialog
+      const storageUpdateEvent = new Event('storageUpdate');
+      window.dispatchEvent(storageUpdateEvent);
 
-    handleOpen();
-    
+      
+      handleOpen();
+    } else {
+      alert("Please fill in all fields before adding a new task.");
+    }
   };
 
   return (
